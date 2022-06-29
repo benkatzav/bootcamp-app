@@ -1,0 +1,32 @@
+# CI pipeline
+
+trigger:
+- master
+
+pool:
+  name: "Default"
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '14.x'
+
+- task: Npm@1
+  inputs:
+    command: 'install'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)'
+    Contents: '*/**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  displayName: 'Artifacts'
+- task: UniversalPackages@0
+  displayName: Upload artifact to azure artifacts
+  inputs:
+    command: 'publish'
+    publishDirectory: '$(Build.ArtifactStagingDirectory)'
+    feedsToUsePublish: 'internal'
+    vstsFeedPublish: '38192d3a-7c72-4c34-8813-cafcf361361f'
+    vstsFeedPackagePublish: 'app-artifact'
+    versionOption: 'patch'
